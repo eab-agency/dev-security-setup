@@ -2,7 +2,7 @@
 set -e
 
 # Version of this setup script - increment when making changes
-VERSION="2.1.0"
+VERSION="2.1.1"
 SECURITY_DIR=".security"
 VERSION_FILE="$SECURITY_DIR/version"
 CONFIG_FILE=".pre-commit-config.yaml"
@@ -106,7 +106,7 @@ get_detect_secrets_block() {
     hooks:
       - id: detect-secrets
         args: ['--baseline', '.security/secrets.baseline']
-        exclude: '(pnpm-lock\.yaml|package-lock\.json|yarn\.lock)$'
+        exclude: '(pnpm-lock\.yaml|package-lock\.json|yarn\.lock|\.security/secrets\.baseline)$'
 HOOK_EOF
 }
 
@@ -219,7 +219,7 @@ repos:
     hooks:
       - id: detect-secrets
         args: ['--baseline', '.security/secrets.baseline']
-        exclude: '(pnpm-lock\.yaml|package-lock\.json|yarn\.lock)$'
+        exclude: '(pnpm-lock\.yaml|package-lock\.json|yarn\.lock|\.security/secrets\.baseline)$'
 
   # Semgrep for additional security checks (catches secrets in seed scripts, etc.)
   - repo: https://github.com/returntocorp/semgrep
