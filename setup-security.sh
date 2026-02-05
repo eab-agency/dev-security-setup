@@ -1,14 +1,31 @@
 #!/bin/bash
 set -e
 
+# Version of this setup script - increment when making changes
+VERSION="1.0.0"
+VERSION_FILE=".security-setup-version"
+
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
 NC='\033[0m' # No Color
+
+# Parse arguments
+FORCE=false
+for arg in "$@"; do
+    case $arg in
+        --force|-f)
+            FORCE=true
+            shift
+            ;;
+    esac
+done
 
 echo -e "${GREEN}=====================================${NC}"
 echo -e "${GREEN}  Secret Detection Pipeline Setup${NC}"
+echo -e "${GREEN}       version $VERSION${NC}"
 echo -e "${GREEN}=====================================${NC}"
 echo ""
 
@@ -16,6 +33,30 @@ echo ""
 if [ ! -d ".git" ]; then
     echo -e "${RED}Error: Not a git repository. Please run this from a git project root.${NC}"
     exit 1
+fi
+
+# Version comparison function (returns 0 if $1 >= $2)
+version_gte() {
+    [ "$(printf '%s\n' "$1" "$2" | sort -V | head -n1)" = "$2" ]
+}
+
+# Check if already set up and up to date
+if [ -f "$VERSION_FILE" ] && [ "$FORCE" = false ]; then
+    INSTALLED_VERSION=$(cat "$VERSION_FILE")
+    if [ "$INSTALLED_VERSION" = "$VERSION" ]; then
+        echo -e "${GREEN}✓ Security setup is already installed and up to date (v$VERSION)${NC}"
+        echo ""
+        echo "To force re-run: setup-security --force"
+        exit 0
+    elif version_gte "$INSTALLED_VERSION" "$VERSION"; then
+        echo -e "${GREEN}✓ Security setup is already installed with newer version (v$INSTALLED_VERSION)${NC}"
+        echo ""
+        echo "To force re-run: setup-security --force"
+        exit 0
+    else
+        echo -e "${BLUE}Upgrading security setup from v$INSTALLED_VERSION to v$VERSION...${NC}"
+        echo ""
+    fi
 fi
 
 # Check for required tools
@@ -267,10 +308,14 @@ echo "Installing pre-commit hooks..."
 pre-commit install --hook-type pre-commit --hook-type pre-push
 echo -e "${GREEN}✓${NC} Installed pre-commit and pre-push hooks"
 
+# Write version file to track installation
+echo "$VERSION" > "$VERSION_FILE"
+echo -e "${GREEN}✓${NC} Recorded setup version ($VERSION)"
+
 # Summary
 echo ""
 echo -e "${GREEN}=====================================${NC}"
-echo -e "${GREEN}  Setup Complete!${NC}"
+echo -e "${GREEN}  Setup Complete! (v$VERSION)${NC}"
 echo -e "${GREEN}=====================================${NC}"
 echo ""
 echo "Your project now has:"
@@ -281,11 +326,12 @@ echo "Files created/updated:"
 echo "  • .pre-commit-config.yaml"
 echo "  • .trufflehogignore"
 echo "  • .secrets.baseline"
+echo "  • .security-setup-version"
 echo "  • .gitignore (added .claude, .planning, .env entries)"
 echo ""
 echo -e "${YELLOW}Next steps:${NC}"
 echo "  1. Review the generated files"
-echo "  2. Add them to git: git add .pre-commit-config.yaml .trufflehogignore .secrets.baseline .gitignore"
+echo "  2. Add them to git: git add .pre-commit-config.yaml .trufflehogignore .secrets.baseline .security-setup-version .gitignore"
 echo "  3. Commit: git commit -m 'chore: add secret detection pipeline'"
 echo ""
 echo -e "${YELLOW}To test the hooks:${NC}"

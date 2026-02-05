@@ -23,10 +23,12 @@ Clone this repo once:
 git clone git@github.com:eab-agency/dev-security-setup.git ~/dev-security-setup
 ```
 
-Add this alias to your shell profile (`~/.zshrc` or `~/.bashrc`):
+Add this function to your shell profile (`~/.zshrc` or `~/.bashrc`):
 
 ```bash
-alias setup-security='(cd ~/dev-security-setup && git pull -q) && ~/dev-security-setup/setup-security.sh'
+setup-security() {
+  (cd ~/dev-security-setup && git pull -q) && ~/dev-security-setup/setup-security.sh "$@"
+}
 ```
 
 Reload your shell:
@@ -43,7 +45,15 @@ From any git project root:
 setup-security
 ```
 
-The alias auto-updates the repo before running.
+The function auto-updates the repo before running.
+
+### Re-running on existing projects
+
+The script tracks which version was installed via `.security-setup-version`. Running again will:
+
+- **Same version**: Skip with "already up to date" message
+- **Newer version available**: Automatically upgrade
+- **Force re-run**: Use `setup-security --force` or `setup-security -f`
 
 ## Files created
 
@@ -52,4 +62,5 @@ The alias auto-updates the repo before running.
 | `.pre-commit-config.yaml` | Hook configuration |
 | `.trufflehogignore` | Paths to skip during scanning |
 | `.secrets.baseline` | Baseline for detect-secrets |
+| `.security-setup-version` | Tracks installed version for upgrades |
 | `.gitignore` | Updated with `.claude`, `.planning`, `.env` entries |
