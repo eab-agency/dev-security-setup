@@ -2,7 +2,7 @@
 set -e
 
 # Version of this setup script - increment when making changes
-VERSION="1.0.0"
+VERSION="1.1.0"
 VERSION_FILE=".security-setup-version"
 
 # Colors for output
@@ -203,49 +203,64 @@ EOF
     echo -e "${GREEN}✓${NC} Created .pre-commit-config.yaml"
 fi
 
-# Create .trufflehogignore
-if [ -f ".trufflehogignore" ]; then
-    echo -e "${YELLOW}⚠ .trufflehogignore already exists - skipping${NC}"
-else
-    echo "Creating .trufflehogignore..."
+# Create or fix .trufflehogignore
+# Note: trufflehog uses regex patterns, not glob patterns
+write_trufflehogignore() {
     cat > .trufflehogignore << 'EOF'
 # Dependencies
-node_modules/
-vendor/
-.pnpm-store/
+node_modules
+vendor
+\.pnpm-store
 
 # Build outputs
-dist/
-build/
-.next/
-out/
+dist
+build
+\.next
+out
 
 # Lock files (contain package integrity hashes, not secrets)
-pnpm-lock.yaml
-package-lock.json
-yarn.lock
-composer.lock
-Gemfile.lock
-poetry.lock
-Cargo.lock
+pnpm-lock\.yaml
+package-lock\.json
+yarn\.lock
+composer\.lock
+Gemfile\.lock
+poetry\.lock
+Cargo\.lock
 
 # Git
-.git/
+\.git
 
 # IDE
-.idea/
-.vscode/
+\.idea
+\.vscode
 
 # Test fixtures and snapshots
-**/__snapshots__/
-**/fixtures/
-**/test-data/
+__snapshots__
+fixtures
+test-data
 
 # Generated files
-*.min.js
-*.min.css
-*.map
+\.min\.js$
+\.min\.css$
+\.map$
 EOF
+}
+
+if [ -f ".trufflehogignore" ]; then
+    # Check for invalid glob patterns that break trufflehog
+    if grep -qE '^\*\*/' .trufflehogignore || grep -qE '^\*\.' .trufflehogignore; then
+        echo -e "${YELLOW}⚠ .trufflehogignore contains invalid glob patterns (trufflehog uses regex)${NC}"
+        BACKUP_FILE=".trufflehogignore.backup.$(date +%Y%m%d_%H%M%S)"
+        cp .trufflehogignore "$BACKUP_FILE"
+        echo -e "  ${GREEN}✓${NC} Backed up to: $BACKUP_FILE"
+        write_trufflehogignore
+        echo -e "  ${GREEN}✓${NC} Regenerated .trufflehogignore with valid regex patterns"
+    else
+        echo -e "${YELLOW}⚠ .trufflehogignore already exists - skipping${NC}"
+    fi
+else
+    echo "Creating .trufflehogignore..."
+    write_trufflehogignore
     echo -e "${GREEN}✓${NC} Created .trufflehogignore"
 fi
 
