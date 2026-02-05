@@ -8,6 +8,7 @@ One-command secret detection pipeline for any project.
 - Installs pre-push hooks for comprehensive secret scanning with verification
 - Creates sensible ignore files to reduce false positives
 - Updates `.gitignore` to exclude sensitive directories
+- Organizes all security config in a `.security/` folder
 
 ## Requirements
 
@@ -49,18 +50,30 @@ The function auto-updates the repo before running.
 
 ### Re-running on existing projects
 
-The script tracks which version was installed via `.security-setup-version`. Running again will:
+The script tracks which version was installed via `.security/version`. Running again will:
 
 - **Same version**: Skip with "already up to date" message
 - **Newer version available**: Automatically upgrade
 - **Force re-run**: Use `setup-security --force` or `setup-security -f`
 
+### Testing hooks manually
+
+```bash
+# Test commit hooks
+pre-commit run --config .security/pre-commit-config.yaml --all-files
+
+# Test push hooks
+pre-commit run --config .security/pre-commit-config.yaml --hook-stage pre-push
+```
+
 ## Files created
+
+All security configuration is organized in the `.security/` folder:
 
 | File | Purpose |
 |------|---------|
-| `.pre-commit-config.yaml` | Hook configuration |
-| `.trufflehogignore` | Paths to skip during scanning |
-| `.secrets.baseline` | Baseline for detect-secrets |
-| `.security-setup-version` | Tracks installed version for upgrades |
+| `.security/pre-commit-config.yaml` | Hook configuration |
+| `.security/trufflehogignore` | Paths to skip during trufflehog scanning |
+| `.security/secrets.baseline` | Baseline for detect-secrets |
+| `.security/version` | Tracks installed version for upgrades |
 | `.gitignore` | Updated with `.claude`, `.planning`, `.env` entries |
