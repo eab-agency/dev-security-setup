@@ -2,7 +2,7 @@
 set -e
 
 # Version of this setup script - increment when making changes
-VERSION="1.2.0"
+VERSION="1.3.0"
 VERSION_FILE=".security-setup-version"
 
 # Colors for output
@@ -193,6 +193,9 @@ if [ -f ".pre-commit-config.yaml" ]; then
 else
     echo "Creating .pre-commit-config.yaml..."
     cat > .pre-commit-config.yaml << 'EOF'
+# Only run hooks on commit by default; trufflehog explicitly runs on pre-push
+default_stages: [commit]
+
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
