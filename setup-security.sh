@@ -2,7 +2,7 @@
 set -e
 
 # Version of this setup script - increment when making changes
-VERSION="2.1.2"
+VERSION="2.1.3"
 SECURITY_DIR=".security"
 VERSION_FILE="$SECURITY_DIR/version"
 CONFIG_FILE=".pre-commit-config.yaml"
@@ -151,11 +151,11 @@ if [ -f "$CONFIG_FILE" ]; then
 
     # Check and add default_stages if missing
     if ! grep -q "default_stages:" "$CONFIG_FILE"; then
-        echo "  Adding default_stages: [commit]..."
+        echo "  Adding default_stages: [pre-commit]..."
         # Prepend to file
         TMP_FILE=$(mktemp)
         echo "# Only run hooks on commit by default; trufflehog explicitly runs on pre-push" > "$TMP_FILE"
-        echo "default_stages: [commit]" >> "$TMP_FILE"
+        echo "default_stages: [pre-commit]" >> "$TMP_FILE"
         echo "" >> "$TMP_FILE"
         cat "$CONFIG_FILE" >> "$TMP_FILE"
         mv "$TMP_FILE" "$CONFIG_FILE"
@@ -217,7 +217,7 @@ else
     echo "Creating $CONFIG_FILE..."
     cat > "$CONFIG_FILE" << 'EOF'
 # Only run hooks on commit by default; trufflehog explicitly runs on pre-push
-default_stages: [commit]
+default_stages: [pre-commit]
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
