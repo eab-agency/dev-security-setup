@@ -34,9 +34,100 @@ check_dependency "pre-commit" "brew install pre-commit"
 check_dependency "trufflehog" "brew install trufflehog"
 echo ""
 
-# Create .pre-commit-config.yaml
+# Define hook blocks as functions for reuse
+get_precommit_hooks_block() {
+    cat << 'HOOK_EOF'
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: check-added-large-files
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+      - id: check-merge-conflict
+      - id: detect-private-key
+HOOK_EOF
+}
+
+get_detect_secrets_block() {
+    cat << 'HOOK_EOF'
+
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.5.0
+    hooks:
+      - id: detect-secrets
+        args: ['--baseline', '.secrets.baseline']
+        exclude: '(pnpm-lock\.yaml|package-lock\.json|yarn\.lock)$'
+HOOK_EOF
+}
+
+get_trufflehog_block() {
+    cat << 'HOOK_EOF'
+
+  # Pre-push hook: comprehensive secret scan with verification
+  - repo: local
+    hooks:
+      - id: trufflehog-filesystem
+        name: trufflehog filesystem scan
+        entry: trufflehog filesystem . --no-update --exclude-paths .trufflehogignore
+        language: system
+        stages: [pre-push]
+        pass_filenames: false
+        always_run: true
+HOOK_EOF
+}
+
+# Create or update .pre-commit-config.yaml
 if [ -f ".pre-commit-config.yaml" ]; then
-    echo -e "${YELLOW}⚠ .pre-commit-config.yaml already exists - skipping${NC}"
+    echo "Found existing .pre-commit-config.yaml - checking for missing hooks..."
+
+    # Create backup
+    BACKUP_FILE=".pre-commit-config.yaml.backup.$(date +%Y%m%d_%H%M%S)"
+    cp .pre-commit-config.yaml "$BACKUP_FILE"
+    echo -e "${GREEN}✓${NC} Created backup: $BACKUP_FILE"
+
+    HOOKS_ADDED=false
+
+    # Check and add pre-commit-hooks repo
+    if ! grep -q "github.com/pre-commit/pre-commit-hooks" .pre-commit-config.yaml; then
+        echo "  Adding pre-commit-hooks..."
+        get_precommit_hooks_block >> .pre-commit-config.yaml
+        HOOKS_ADDED=true
+    else
+        echo -e "  ${YELLOW}⚠${NC} pre-commit-hooks already present"
+    fi
+
+    # Check and add detect-secrets repo
+    if ! grep -q "github.com/Yelp/detect-secrets" .pre-commit-config.yaml; then
+        echo "  Adding detect-secrets..."
+        get_detect_secrets_block >> .pre-commit-config.yaml
+        HOOKS_ADDED=true
+    else
+        echo -e "  ${YELLOW}⚠${NC} detect-secrets already present"
+    fi
+
+    # Check and add trufflehog hook
+    if ! grep -q "trufflehog-filesystem" .pre-commit-config.yaml; then
+        echo "  Adding trufflehog pre-push hook..."
+        get_trufflehog_block >> .pre-commit-config.yaml
+        HOOKS_ADDED=true
+    else
+        echo -e "  ${YELLOW}⚠${NC} trufflehog-filesystem already present"
+    fi
+
+    if [ "$HOOKS_ADDED" = true ]; then
+        echo ""
+        echo -e "${GREEN}✓${NC} Updated .pre-commit-config.yaml"
+        echo ""
+        echo -e "${YELLOW}Changes made (diff):${NC}"
+        diff "$BACKUP_FILE" .pre-commit-config.yaml || true
+        echo ""
+        echo -e "${YELLOW}Review the changes above. To revert:${NC}"
+        echo "  mv $BACKUP_FILE .pre-commit-config.yaml"
+    else
+        echo -e "${GREEN}✓${NC} All security hooks already present"
+        rm "$BACKUP_FILE"  # No changes needed, remove backup
+    fi
 else
     echo "Creating .pre-commit-config.yaml..."
     cat > .pre-commit-config.yaml << 'EOF'
@@ -56,13 +147,6 @@ repos:
       - id: detect-secrets
         args: ['--baseline', '.secrets.baseline']
         exclude: '(pnpm-lock\.yaml|package-lock\.json|yarn\.lock)$'
-
-  # Optional: semgrep for additional security checks
-  # - repo: https://github.com/returntocorp/semgrep
-  #   rev: v1.73.0
-  #   hooks:
-  #     - id: semgrep
-  #       args: ["--config", "p/ci", "--error", "--metrics=off"]
 
   # Pre-push hook: comprehensive secret scan with verification
   - repo: local
