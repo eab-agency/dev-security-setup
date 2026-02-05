@@ -20,7 +20,7 @@ brew install pre-commit trufflehog
 Clone this repo once:
 
 ```bash
-git clone git@github.com:YOUR_ORG/dev-security-setup.git ~/dev-security-setup
+git clone git@github.com:eab-agency/dev-security-setup.git ~/dev-security-setup
 ```
 
 Add this alias to your shell profile (`~/.zshrc` or `~/.bashrc`):
