@@ -2,7 +2,7 @@
 set -e
 
 # Version of this setup script - increment when making changes
-VERSION="1.1.0"
+VERSION="1.2.0"
 VERSION_FILE=".security-setup-version"
 
 # Colors for output
@@ -102,6 +102,18 @@ get_detect_secrets_block() {
 HOOK_EOF
 }
 
+get_semgrep_block() {
+    cat << 'HOOK_EOF'
+
+  # Semgrep for additional security checks (catches secrets in seed scripts, etc.)
+  - repo: https://github.com/returntocorp/semgrep
+    rev: v1.73.0
+    hooks:
+      - id: semgrep
+        args: ["--config", "p/ci", "--error", "--metrics=off"]
+HOOK_EOF
+}
+
 get_trufflehog_block() {
     cat << 'HOOK_EOF'
 
@@ -109,7 +121,7 @@ get_trufflehog_block() {
   - repo: local
     hooks:
       - id: trufflehog-filesystem
-        name: trufflehog filesystem scan
+        name: trufflehog filesystem scan (no node_modules)
         entry: trufflehog filesystem . --no-update --exclude-paths .trufflehogignore
         language: system
         stages: [pre-push]
@@ -145,6 +157,15 @@ if [ -f ".pre-commit-config.yaml" ]; then
         HOOKS_ADDED=true
     else
         echo -e "  ${YELLOW}⚠${NC} detect-secrets already present"
+    fi
+
+    # Check and add semgrep repo
+    if ! grep -q "github.com/returntocorp/semgrep" .pre-commit-config.yaml; then
+        echo "  Adding semgrep..."
+        get_semgrep_block >> .pre-commit-config.yaml
+        HOOKS_ADDED=true
+    else
+        echo -e "  ${YELLOW}⚠${NC} semgrep already present"
     fi
 
     # Check and add trufflehog hook
@@ -189,11 +210,18 @@ repos:
         args: ['--baseline', '.secrets.baseline']
         exclude: '(pnpm-lock\.yaml|package-lock\.json|yarn\.lock)$'
 
+  # Semgrep for additional security checks (catches secrets in seed scripts, etc.)
+  - repo: https://github.com/returntocorp/semgrep
+    rev: v1.73.0
+    hooks:
+      - id: semgrep
+        args: ["--config", "p/ci", "--error", "--metrics=off"]
+
   # Pre-push hook: comprehensive secret scan with verification
   - repo: local
     hooks:
       - id: trufflehog-filesystem
-        name: trufflehog filesystem scan
+        name: trufflehog filesystem scan (no node_modules)
         entry: trufflehog filesystem . --no-update --exclude-paths .trufflehogignore
         language: system
         stages: [pre-push]
@@ -204,45 +232,15 @@ EOF
 fi
 
 # Create or fix .trufflehogignore
-# Note: trufflehog uses regex patterns, not glob patterns
+# Note: trufflehog exclude-paths uses simple path matching
 write_trufflehogignore() {
     cat > .trufflehogignore << 'EOF'
-# Dependencies
 node_modules
-vendor
-\.pnpm-store
-
-# Build outputs
 dist
 build
-\.next
-out
-
-# Lock files (contain package integrity hashes, not secrets)
-pnpm-lock\.yaml
-package-lock\.json
-yarn\.lock
-composer\.lock
-Gemfile\.lock
-poetry\.lock
-Cargo\.lock
-
-# Git
-\.git
-
-# IDE
-\.idea
-\.vscode
-
-# Test fixtures and snapshots
-__snapshots__
-fixtures
-test-data
-
-# Generated files
-\.min\.js$
-\.min\.css$
-\.map$
+.next
+coverage
+.cache
 EOF
 }
 
