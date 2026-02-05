@@ -2,9 +2,10 @@
 set -e
 
 # Version of this setup script - increment when making changes
-VERSION="2.0.0"
+VERSION="2.1.0"
 SECURITY_DIR=".security"
 VERSION_FILE="$SECURITY_DIR/version"
+CONFIG_FILE=".pre-commit-config.yaml"
 
 # Colors for output
 RED='\033[0;31m'
@@ -76,7 +77,7 @@ check_dependency "pre-commit" "brew install pre-commit"
 check_dependency "trufflehog" "brew install trufflehog"
 echo ""
 
-# Create .security directory
+# Create .security directory for auxiliary files
 if [ ! -d "$SECURITY_DIR" ]; then
     mkdir -p "$SECURITY_DIR"
     echo -e "${GREEN}✓${NC} Created $SECURITY_DIR directory"
@@ -137,9 +138,7 @@ get_trufflehog_block() {
 HOOK_EOF
 }
 
-CONFIG_FILE="$SECURITY_DIR/pre-commit-config.yaml"
-
-# Create or update pre-commit config
+# Create or update .pre-commit-config.yaml (at root - standard location)
 if [ -f "$CONFIG_FILE" ]; then
     echo "Found existing $CONFIG_FILE - checking for missing hooks..."
 
@@ -243,7 +242,7 @@ EOF
     echo -e "${GREEN}✓${NC} Created $CONFIG_FILE"
 fi
 
-# Create or fix trufflehogignore
+# Create or fix trufflehogignore (in .security/)
 TRUFFLEHOG_IGNORE="$SECURITY_DIR/trufflehogignore"
 write_trufflehogignore() {
     cat > "$TRUFFLEHOG_IGNORE" << 'EOF'
@@ -319,7 +318,7 @@ else
     echo -e "${YELLOW}⚠${NC} .gitignore already contains all entries"
 fi
 
-# Create secrets baseline
+# Create secrets baseline (in .security/)
 BASELINE_FILE="$SECURITY_DIR/secrets.baseline"
 if [ -f "$BASELINE_FILE" ]; then
     echo -e "${YELLOW}⚠ $BASELINE_FILE already exists - updating...${NC}"
@@ -328,13 +327,13 @@ echo "Generating $BASELINE_FILE..."
 detect-secrets scan --exclude-files '(pnpm-lock\.yaml|package-lock\.json|yarn\.lock)$' > "$BASELINE_FILE"
 echo -e "${GREEN}✓${NC} Generated $BASELINE_FILE"
 
-# Install pre-commit hooks with custom config path
+# Install pre-commit hooks
 echo ""
 echo "Installing pre-commit hooks..."
-pre-commit install --config "$CONFIG_FILE" --hook-type pre-commit --hook-type pre-push
+pre-commit install --hook-type pre-commit --hook-type pre-push
 echo -e "${GREEN}✓${NC} Installed pre-commit and pre-push hooks"
 
-# Write version file to track installation
+# Write version file to track installation (in .security/)
 echo "$VERSION" > "$VERSION_FILE"
 echo -e "${GREEN}✓${NC} Recorded setup version ($VERSION)"
 
@@ -348,18 +347,18 @@ echo "Your project now has:"
 echo "  - Pre-commit hooks: detect-secrets, detect-private-key, and more"
 echo "  - Pre-push hooks: trufflehog with verified secret detection"
 echo ""
-echo "Files created/updated in .security/:"
-echo "  - .security/pre-commit-config.yaml"
-echo "  - .security/trufflehogignore"
-echo "  - .security/secrets.baseline"
-echo "  - .security/version"
+echo "Files created/updated:"
+echo "  - .pre-commit-config.yaml (hook configuration)"
+echo "  - .security/trufflehogignore (paths to skip)"
+echo "  - .security/secrets.baseline (detect-secrets baseline)"
+echo "  - .security/version (tracks setup version)"
 echo "  - .gitignore (added .claude, .planning, .env entries)"
 echo ""
 echo -e "${YELLOW}Next steps:${NC}"
 echo "  1. Review the generated files"
-echo "  2. Add them to git: git add .security .gitignore"
+echo "  2. Add them to git: git add .pre-commit-config.yaml .security .gitignore"
 echo "  3. Commit: git commit -m 'chore: add secret detection pipeline'"
 echo ""
 echo -e "${YELLOW}To test the hooks:${NC}"
-echo "  - Commit hook: pre-commit run --config .security/pre-commit-config.yaml --all-files"
-echo "  - Push hook: pre-commit run --config .security/pre-commit-config.yaml --hook-stage pre-push"
+echo "  - Commit hook: pre-commit run --all-files"
+echo "  - Push hook: pre-commit run --hook-stage pre-push"

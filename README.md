@@ -8,7 +8,6 @@ One-command secret detection pipeline for any project.
 - Installs pre-push hooks for comprehensive secret scanning with verification
 - Creates sensible ignore files to reduce false positives
 - Updates `.gitignore` to exclude sensitive directories
-- Organizes all security config in a `.security/` folder
 
 ## Requirements
 
@@ -60,19 +59,17 @@ The script tracks which version was installed via `.security/version`. Running a
 
 ```bash
 # Test commit hooks
-pre-commit run --config .security/pre-commit-config.yaml --all-files
+pre-commit run --all-files
 
 # Test push hooks
-pre-commit run --config .security/pre-commit-config.yaml --hook-stage pre-push
+pre-commit run --hook-stage pre-push
 ```
 
 ## Files created
 
-All security configuration is organized in the `.security/` folder:
-
 | File | Purpose |
 |------|---------|
-| `.security/pre-commit-config.yaml` | Hook configuration |
+| `.pre-commit-config.yaml` | Hook configuration (standard location, can add other hooks) |
 | `.security/trufflehogignore` | Paths to skip during trufflehog scanning |
 | `.security/secrets.baseline` | Baseline for detect-secrets |
 | `.security/version` | Tracks installed version for upgrades |
