@@ -2,7 +2,7 @@
 set -e
 
 # Version of this setup script - increment when making changes
-VERSION="2.1.1"
+VERSION="2.1.2"
 SECURITY_DIR=".security"
 VERSION_FILE="$SECURITY_DIR/version"
 CONFIG_FILE=".pre-commit-config.yaml"
@@ -147,13 +147,28 @@ if [ -f "$CONFIG_FILE" ]; then
     cp "$CONFIG_FILE" "$BACKUP_FILE"
     echo -e "${GREEN}✓${NC} Created backup: $BACKUP_FILE"
 
-    HOOKS_ADDED=false
+    CONFIG_MODIFIED=false
+
+    # Check and add default_stages if missing
+    if ! grep -q "default_stages:" "$CONFIG_FILE"; then
+        echo "  Adding default_stages: [commit]..."
+        # Prepend to file
+        TMP_FILE=$(mktemp)
+        echo "# Only run hooks on commit by default; trufflehog explicitly runs on pre-push" > "$TMP_FILE"
+        echo "default_stages: [commit]" >> "$TMP_FILE"
+        echo "" >> "$TMP_FILE"
+        cat "$CONFIG_FILE" >> "$TMP_FILE"
+        mv "$TMP_FILE" "$CONFIG_FILE"
+        CONFIG_MODIFIED=true
+    else
+        echo -e "  ${YELLOW}⚠${NC} default_stages already present"
+    fi
 
     # Check and add pre-commit-hooks repo
     if ! grep -q "github.com/pre-commit/pre-commit-hooks" "$CONFIG_FILE"; then
         echo "  Adding pre-commit-hooks..."
         get_precommit_hooks_block >> "$CONFIG_FILE"
-        HOOKS_ADDED=true
+        CONFIG_MODIFIED=true
     else
         echo -e "  ${YELLOW}⚠${NC} pre-commit-hooks already present"
     fi
@@ -162,7 +177,7 @@ if [ -f "$CONFIG_FILE" ]; then
     if ! grep -q "github.com/Yelp/detect-secrets" "$CONFIG_FILE"; then
         echo "  Adding detect-secrets..."
         get_detect_secrets_block >> "$CONFIG_FILE"
-        HOOKS_ADDED=true
+        CONFIG_MODIFIED=true
     else
         echo -e "  ${YELLOW}⚠${NC} detect-secrets already present"
     fi
@@ -171,7 +186,7 @@ if [ -f "$CONFIG_FILE" ]; then
     if ! grep -q "github.com/returntocorp/semgrep" "$CONFIG_FILE"; then
         echo "  Adding semgrep..."
         get_semgrep_block >> "$CONFIG_FILE"
-        HOOKS_ADDED=true
+        CONFIG_MODIFIED=true
     else
         echo -e "  ${YELLOW}⚠${NC} semgrep already present"
     fi
@@ -180,12 +195,12 @@ if [ -f "$CONFIG_FILE" ]; then
     if ! grep -q "trufflehog-filesystem" "$CONFIG_FILE"; then
         echo "  Adding trufflehog pre-push hook..."
         get_trufflehog_block >> "$CONFIG_FILE"
-        HOOKS_ADDED=true
+        CONFIG_MODIFIED=true
     else
         echo -e "  ${YELLOW}⚠${NC} trufflehog-filesystem already present"
     fi
 
-    if [ "$HOOKS_ADDED" = true ]; then
+    if [ "$CONFIG_MODIFIED" = true ]; then
         echo ""
         echo -e "${GREEN}✓${NC} Updated $CONFIG_FILE"
         echo ""
