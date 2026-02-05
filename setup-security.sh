@@ -2,7 +2,7 @@
 set -e
 
 # Version of this setup script - increment when making changes
-VERSION="2.1.3"
+VERSION="2.2.0"
 SECURITY_DIR=".security"
 VERSION_FILE="$SECURITY_DIR/version"
 CONFIG_FILE=".pre-commit-config.yaml"
@@ -16,11 +16,37 @@ NC='\033[0m' # No Color
 
 # Parse arguments
 FORCE=false
+WITH_COMMITLINT=false
+WITH_LINTING=false
 for arg in "$@"; do
     case $arg in
         --force|-f)
             FORCE=true
             shift
+            ;;
+        --with-commitlint)
+            WITH_COMMITLINT=true
+            shift
+            ;;
+        --with-linting)
+            WITH_LINTING=true
+            shift
+            ;;
+        --help|-h)
+            echo "Usage: setup-security [OPTIONS]"
+            echo ""
+            echo "Options:"
+            echo "  -f, --force          Force re-run even if already installed"
+            echo "  --with-commitlint    Add commitlint hook for conventional commits"
+            echo "  --with-linting       Add ESLint and Prettier hooks"
+            echo "  -h, --help           Show this help message"
+            echo ""
+            echo "Examples:"
+            echo "  setup-security                          # Basic security setup"
+            echo "  setup-security --with-commitlint        # Add commit message linting"
+            echo "  setup-security --with-linting           # Add code linting (ESLint/Prettier)"
+            echo "  setup-security --with-commitlint --with-linting  # Add both"
+            exit 0
             ;;
     esac
 done
@@ -138,6 +164,40 @@ get_trufflehog_block() {
 HOOK_EOF
 }
 
+get_commitlint_block() {
+    cat << 'HOOK_EOF'
+
+  # Commitlint: enforce conventional commit messages
+  - repo: https://github.com/alessandrojcm/commitlint-pre-commit-hook
+    rev: v9.18.0
+    hooks:
+      - id: commitlint
+        stages: [commit-msg]
+        additional_dependencies: ['@commitlint/config-conventional']
+HOOK_EOF
+}
+
+get_linting_block() {
+    cat << 'HOOK_EOF'
+
+  # Code quality: ESLint and Prettier (runs only on staged files)
+  - repo: local
+    hooks:
+      - id: eslint
+        name: eslint
+        entry: npx eslint --fix --max-warnings=0
+        language: system
+        types_or: [javascript, jsx, typescript, tsx]
+        pass_filenames: true
+      - id: prettier
+        name: prettier
+        entry: npx prettier --write --ignore-unknown
+        language: system
+        types_or: [javascript, jsx, typescript, tsx, json, yaml, markdown, css, scss]
+        pass_filenames: true
+HOOK_EOF
+}
+
 # Create or update .pre-commit-config.yaml (at root - standard location)
 if [ -f "$CONFIG_FILE" ]; then
     echo "Found existing $CONFIG_FILE - checking for missing hooks..."
@@ -200,6 +260,28 @@ if [ -f "$CONFIG_FILE" ]; then
         echo -e "  ${YELLOW}⚠${NC} trufflehog-filesystem already present"
     fi
 
+    # Optional: commitlint (only if --with-commitlint flag is passed)
+    if [ "$WITH_COMMITLINT" = true ]; then
+        if ! grep -q "commitlint-pre-commit-hook" "$CONFIG_FILE"; then
+            echo "  Adding commitlint hook..."
+            get_commitlint_block >> "$CONFIG_FILE"
+            CONFIG_MODIFIED=true
+        else
+            echo -e "  ${YELLOW}⚠${NC} commitlint already present"
+        fi
+    fi
+
+    # Optional: ESLint/Prettier (only if --with-linting flag is passed)
+    if [ "$WITH_LINTING" = true ]; then
+        if ! grep -q "id: eslint" "$CONFIG_FILE"; then
+            echo "  Adding ESLint and Prettier hooks..."
+            get_linting_block >> "$CONFIG_FILE"
+            CONFIG_MODIFIED=true
+        else
+            echo -e "  ${YELLOW}⚠${NC} ESLint/Prettier already present"
+        fi
+    fi
+
     if [ "$CONFIG_MODIFIED" = true ]; then
         echo ""
         echo -e "${GREEN}✓${NC} Updated $CONFIG_FILE"
@@ -254,6 +336,18 @@ repos:
         pass_filenames: false
         always_run: true
 EOF
+
+    # Append optional hooks if flags are passed
+    if [ "$WITH_COMMITLINT" = true ]; then
+        echo "  Adding commitlint hook..."
+        get_commitlint_block >> "$CONFIG_FILE"
+    fi
+
+    if [ "$WITH_LINTING" = true ]; then
+        echo "  Adding ESLint and Prettier hooks..."
+        get_linting_block >> "$CONFIG_FILE"
+    fi
+
     echo -e "${GREEN}✓${NC} Created $CONFIG_FILE"
 fi
 
@@ -345,8 +439,13 @@ echo -e "${GREEN}✓${NC} Generated $BASELINE_FILE"
 # Install pre-commit hooks
 echo ""
 echo "Installing pre-commit hooks..."
-pre-commit install --hook-type pre-commit --hook-type pre-push
-echo -e "${GREEN}✓${NC} Installed pre-commit and pre-push hooks"
+if [ "$WITH_COMMITLINT" = true ]; then
+    pre-commit install --hook-type pre-commit --hook-type pre-push --hook-type commit-msg
+    echo -e "${GREEN}✓${NC} Installed pre-commit, pre-push, and commit-msg hooks"
+else
+    pre-commit install --hook-type pre-commit --hook-type pre-push
+    echo -e "${GREEN}✓${NC} Installed pre-commit and pre-push hooks"
+fi
 
 # Write version file to track installation (in .security/)
 echo "$VERSION" > "$VERSION_FILE"
@@ -361,6 +460,12 @@ echo ""
 echo "Your project now has:"
 echo "  - Pre-commit hooks: detect-secrets, detect-private-key, and more"
 echo "  - Pre-push hooks: trufflehog with verified secret detection"
+if [ "$WITH_COMMITLINT" = true ]; then
+echo "  - Commit-msg hooks: commitlint (conventional commits)"
+fi
+if [ "$WITH_LINTING" = true ]; then
+echo "  - Code quality hooks: ESLint and Prettier"
+fi
 echo ""
 echo "Files created/updated:"
 echo "  - .pre-commit-config.yaml (hook configuration)"
@@ -369,6 +474,21 @@ echo "  - .security/secrets.baseline (detect-secrets baseline)"
 echo "  - .security/version (tracks setup version)"
 echo "  - .gitignore (added .claude, .planning, .env entries)"
 echo ""
+if [ "$WITH_COMMITLINT" = true ]; then
+echo -e "${YELLOW}Commitlint setup:${NC}"
+echo "  Create a commitlint.config.js in your project root:"
+echo "    module.exports = { extends: ['@commitlint/config-conventional'] };"
+echo ""
+echo "  Commit message format: <type>(<scope>): <subject>"
+echo "  Types: feat, fix, docs, style, refactor, test, chore"
+echo ""
+fi
+if [ "$WITH_LINTING" = true ]; then
+echo -e "${YELLOW}Linting setup:${NC}"
+echo "  Ensure ESLint and Prettier are installed in your project:"
+echo "    npm install -D eslint prettier"
+echo ""
+fi
 echo -e "${YELLOW}Next steps:${NC}"
 echo "  1. Review the generated files"
 echo "  2. Add them to git: git add .pre-commit-config.yaml .security .gitignore"
@@ -377,3 +497,6 @@ echo ""
 echo -e "${YELLOW}To test the hooks:${NC}"
 echo "  - Commit hook: pre-commit run --all-files"
 echo "  - Push hook: pre-commit run --hook-stage pre-push"
+if [ "$WITH_COMMITLINT" = true ]; then
+echo "  - Commit-msg hook: echo 'feat: test' | npx commitlint"
+fi
