@@ -11,8 +11,8 @@ See: .planning/PROJECT.md (updated 2026-02-05)
 
 Phase: 2 of 6 (Version Check)
 Plan: Not started
-Status: Ready to plan
-Last activity: 2026-02-06 — Completed 01-01-PLAN.md (Phase 1 complete)
+Status: Research complete — ready to plan
+Last activity: 2026-02-05 — Completed Phase 2 research
 
 Progress: █░░░░░░░░░ 9%
 
@@ -41,6 +41,7 @@ Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting current work:
 
 - Phase 1: v3.0.0 major bump — distribution model changes from clone to Homebrew
+- Phase 2 research: grep+sed over jq (no extra dep), 24h file-based cache, silent failure mode
 
 ### Deferred Issues
 
@@ -52,6 +53,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-06
-Stopped at: Completed 01-01-PLAN.md — Phase 1 complete
+Last session: 2026-02-05
+Stopped at: Phase 2 research complete — ready for /gsd:plan-phase 2
 Resume file: None
