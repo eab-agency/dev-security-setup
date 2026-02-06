@@ -53,11 +53,10 @@ Plans:
 **Depends on**: Phase 3
 **Research**: Likely (Homebrew formula conventions)
 **Research topics**: Homebrew formula DSL, `depends_on` for non-core taps, formula test blocks, tap repository structure
-**Plans**: 2 plans
+**Plans**: 1 plan (consolidated — testing is part of creation)
 
 Plans:
-- [ ] 04-01: Create homebrew-tools repo with Formula/dev-security-setup.rb
-- [ ] 04-02: Test formula installation and dependency resolution
+- [ ] 04-01: Create homebrew-tools repo with formula, tap and validate
 
 ### Phase 5: Documentation
 **Goal**: Update README to replace clone-based installation with Homebrew instructions, document all CLI flags, and remove obsolete setup steps
@@ -88,6 +87,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 1. Script Preparation | 1/1 | Complete | 2026-02-06 |
 | 2. Version Check | 1/1 | Complete | 2026-02-06 |
 | 3. Release Infrastructure | 1/1 | Complete | 2026-02-06 |
-| 4. Homebrew Tap | 0/2 | Not started | - |
+| 4. Homebrew Tap | 0/1 | Not started | - |
 | 5. Documentation | 0/2 | Not started | - |
 | 6. Validation | 0/1 | Not started | - |
