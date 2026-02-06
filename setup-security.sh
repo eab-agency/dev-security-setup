@@ -2,7 +2,7 @@
 set -e
 
 # Version of this setup script - increment when making changes
-VERSION="2.2.0"
+VERSION="3.0.0"
 SECURITY_DIR=".security"
 VERSION_FILE="$SECURITY_DIR/version"
 CONFIG_FILE=".pre-commit-config.yaml"
