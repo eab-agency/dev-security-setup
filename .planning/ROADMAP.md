@@ -12,7 +12,7 @@ None
 
 - [x] **Phase 1: Script Preparation** - Adapt setup-security.sh for standalone Homebrew execution
 - [x] **Phase 2: Version Check** - Add version-check alerting to replace git-pull auto-update
-- [ ] **Phase 3: Release Infrastructure** - Semver tagging, GitHub releases, and tarball generation
+- [x] **Phase 3: Release Infrastructure** - Semver tagging, GitHub releases, and tarball generation
 - [ ] **Phase 4: Homebrew Tap** - Create eab-agency/homebrew-tools with formula
 - [ ] **Phase 5: Documentation** - Update README with Homebrew install instructions
 - [ ] **Phase 6: Validation** - End-to-end testing of brew install workflow
@@ -46,7 +46,7 @@ Plans:
 **Plans**: 1 plan (consolidated — SHA256 is part of release process documentation, not a separate workflow)
 
 Plans:
-- [ ] 03-01: Create release workflow and document release process
+- [x] 03-01: Create release workflow and document release process
 
 ### Phase 4: Homebrew Tap
 **Goal**: Create the `eab-agency/homebrew-tools` repository with a formula that installs `setup-security` with `pre-commit` and `trufflehog` as dependencies
@@ -87,7 +87,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 |-------|----------------|--------|-----------|
 | 1. Script Preparation | 1/1 | Complete | 2026-02-06 |
 | 2. Version Check | 1/1 | Complete | 2026-02-06 |
-| 3. Release Infrastructure | 0/2 | Not started | - |
+| 3. Release Infrastructure | 1/1 | Complete | 2026-02-06 |
 | 4. Homebrew Tap | 0/2 | Not started | - |
 | 5. Documentation | 0/2 | Not started | - |
 | 6. Validation | 0/1 | Not started | - |
