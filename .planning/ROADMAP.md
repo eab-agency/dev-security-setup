@@ -15,7 +15,7 @@ None
 - [x] **Phase 3: Release Infrastructure** - Semver tagging, GitHub releases, and tarball generation
 - [x] **Phase 4: Homebrew Tap** - Create eab-agency/homebrew-tools with formula
 - [x] **Phase 5: Documentation** - Update README with Homebrew install instructions
-- [ ] **Phase 6: Validation** - End-to-end testing of brew install workflow
+- [x] **Phase 6: Validation** - End-to-end testing of brew install workflow
 
 ## Phase Details
 
@@ -74,7 +74,7 @@ Plans:
 **Plans**: 1 plan
 
 Plans:
-- [ ] 06-01: Full integration test — install, configure a project, verify version tracking and upgrade alerting
+- [x] 06-01: Full integration test — install, configure a project, verify version tracking and upgrade alerting
 
 ## Progress
 
@@ -88,4 +88,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 3. Release Infrastructure | 1/1 | Complete | 2026-02-06 |
 | 4. Homebrew Tap | 1/1 | Complete | 2026-02-06 |
 | 5. Documentation | 1/1 | Complete | 2026-02-06 |
-| 6. Validation | 0/1 | Not started | - |
+| 6. Validation | 1/1 | Complete | 2026-02-06 |
