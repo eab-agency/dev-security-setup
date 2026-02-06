@@ -67,6 +67,9 @@ echo -e "${GREEN}       version $VERSION${NC}"
 echo -e "${GREEN}=====================================${NC}"
 echo ""
 
+# Check for updates (non-blocking, cached)
+check_for_updates || true
+
 # Check if we're in a git repository
 if [ ! -d ".git" ]; then
     echo -e "${RED}Error: Not a git repository. Please run this from a git project root.${NC}"
