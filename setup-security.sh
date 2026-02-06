@@ -32,6 +32,10 @@ for arg in "$@"; do
             WITH_LINTING=true
             shift
             ;;
+        --version|-v)
+            echo "setup-security version $VERSION"
+            exit 0
+            ;;
         --help|-h)
             echo "Usage: setup-security [OPTIONS]"
             echo ""
@@ -39,6 +43,7 @@ for arg in "$@"; do
             echo "  -f, --force          Force re-run even if already installed"
             echo "  --with-commitlint    Add commitlint hook for conventional commits"
             echo "  --with-linting       Add ESLint and Prettier hooks"
+            echo "  -v, --version        Show version"
             echo "  -h, --help           Show this help message"
             echo ""
             echo "Examples:"
@@ -101,6 +106,7 @@ check_dependency() {
 echo "Checking dependencies..."
 check_dependency "pre-commit" "brew install pre-commit"
 check_dependency "trufflehog" "brew install trufflehog"
+check_dependency "detect-secrets" "pip install detect-secrets"
 echo ""
 
 # Create .security directory for auxiliary files
