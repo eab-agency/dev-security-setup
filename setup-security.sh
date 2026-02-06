@@ -3,6 +3,13 @@ set -e
 
 # Version of this setup script - increment when making changes
 VERSION="3.0.0"
+# Release process:
+#   1. Update VERSION above to match the new version
+#   2. Commit: git commit -am "chore: bump version to X.Y.Z"
+#   3. Tag: git tag vX.Y.Z
+#   4. Push: git push origin main --tags
+#   5. GitHub Actions creates the release automatically
+#   6. Update Homebrew formula SHA256: curl -sL https://github.com/eab-agency/dev-security-setup/archive/refs/tags/vX.Y.Z.tar.gz | shasum -a 256
 SECURITY_DIR=".security"
 VERSION_FILE="$SECURITY_DIR/version"
 CONFIG_FILE=".pre-commit-config.yaml"
