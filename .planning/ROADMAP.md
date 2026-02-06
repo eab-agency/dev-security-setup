@@ -43,11 +43,10 @@ Plans:
 **Depends on**: Phase 2
 **Research**: Likely (GitHub Actions release automation)
 **Research topics**: GitHub Actions release workflow, automatic SHA256 generation, tarball URL patterns for Homebrew
-**Plans**: 2 plans
+**Plans**: 1 plan (consolidated — SHA256 is part of release process documentation, not a separate workflow)
 
 Plans:
-- [ ] 03-01: Create GitHub Actions workflow for automated releases on tag push
-- [ ] 03-02: Generate and publish SHA256 hash alongside release tarball
+- [ ] 03-01: Create release workflow and document release process
 
 ### Phase 4: Homebrew Tap
 **Goal**: Create the `eab-agency/homebrew-tools` repository with a formula that installs `setup-security` with `pre-commit` and `trufflehog` as dependencies
