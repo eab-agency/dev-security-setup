@@ -7,6 +7,11 @@ SECURITY_DIR=".security"
 VERSION_FILE="$SECURITY_DIR/version"
 CONFIG_FILE=".pre-commit-config.yaml"
 
+# Update check cache
+UPDATE_CHECK_CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/setup-security"
+UPDATE_CHECK_CACHE_FILE="$UPDATE_CHECK_CACHE_DIR/latest-version"
+UPDATE_CHECK_INTERVAL=86400  # 24 hours in seconds
+
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -71,6 +76,45 @@ fi
 # Version comparison function (returns 0 if $1 >= $2)
 version_gte() {
     [ "$(printf '%s\n' "$1" "$2" | sort -V | head -n1)" = "$2" ]
+}
+
+# Check for newer version on GitHub (non-blocking, cached)
+check_for_updates() {
+    local latest=""
+    local cache_is_fresh=false
+
+    # Check if cache exists and is fresh (less than 24 hours old)
+    if [ -f "$UPDATE_CHECK_CACHE_FILE" ]; then
+        local last_modified
+        last_modified=$(stat -f %m "$UPDATE_CHECK_CACHE_FILE" 2>/dev/null || stat -c %Y "$UPDATE_CHECK_CACHE_FILE" 2>/dev/null || echo "0")
+        local now
+        now=$(date +%s)
+        if [ $((now - last_modified)) -lt $UPDATE_CHECK_INTERVAL ]; then
+            cache_is_fresh=true
+            latest=$(cat "$UPDATE_CHECK_CACHE_FILE")
+        fi
+    fi
+
+    # If cache is stale or missing, query GitHub API
+    if [ "$cache_is_fresh" = false ]; then
+        latest=$(curl -sL --connect-timeout 3 --max-time 5 \
+            "https://api.github.com/repos/eab-agency/dev-security-setup/releases/latest" \
+            2>/dev/null | grep '"tag_name"' | sed -E 's/.*"v?([^"]+)".*/\1/')
+
+        # If fetch failed or returned empty, skip silently
+        [ -z "$latest" ] && return 0
+
+        # Cache the result
+        mkdir -p "$UPDATE_CHECK_CACHE_DIR"
+        echo "$latest" > "$UPDATE_CHECK_CACHE_FILE"
+    fi
+
+    # Compare versions — alert if current is older than latest
+    if [ -n "$latest" ] && ! version_gte "$VERSION" "$latest"; then
+        echo -e "${YELLOW}Update available: v$latest (current: v$VERSION)${NC}"
+        echo -e "${YELLOW}Run: brew upgrade dev-security-setup${NC}"
+        echo ""
+    fi
 }
 
 # Check if already set up and up to date
