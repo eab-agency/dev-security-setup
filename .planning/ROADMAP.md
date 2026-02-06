@@ -11,7 +11,7 @@ None
 ## Phases
 
 - [x] **Phase 1: Script Preparation** - Adapt setup-security.sh for standalone Homebrew execution
-- [ ] **Phase 2: Version Check** - Add version-check alerting to replace git-pull auto-update
+- [x] **Phase 2: Version Check** - Add version-check alerting to replace git-pull auto-update
 - [ ] **Phase 3: Release Infrastructure** - Semver tagging, GitHub releases, and tarball generation
 - [ ] **Phase 4: Homebrew Tap** - Create eab-agency/homebrew-tools with formula
 - [ ] **Phase 5: Documentation** - Update README with Homebrew install instructions
@@ -33,11 +33,10 @@ Plans:
 **Depends on**: Phase 1
 **Research**: Likely (GitHub API for version checking)
 **Research topics**: GitHub API latest release endpoint, version comparison in bash, caching to avoid API rate limits on every run
-**Plans**: 2 plans
+**Plans**: 1 plan (consolidated — both concerns fit in single plan)
 
 Plans:
-- [ ] 02-01: Implement version-check logic (query GitHub releases, compare with installed version)
-- [ ] 02-02: Integrate version-check into script startup with caching (don't hit API every run)
+- [x] 02-01: Version-check function with caching, GitHub API query, and startup integration
 
 ### Phase 3: Release Infrastructure
 **Goal**: Set up GitHub release workflow so tagged versions produce tarballs with SHA256 hashes that the Homebrew formula can reference
@@ -88,7 +87,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Script Preparation | 1/1 | Complete | 2026-02-06 |
-| 2. Version Check | 0/2 | Not started | - |
+| 2. Version Check | 1/1 | Complete | 2026-02-06 |
 | 3. Release Infrastructure | 0/2 | Not started | - |
 | 4. Homebrew Tap | 0/2 | Not started | - |
 | 5. Documentation | 0/2 | Not started | - |
