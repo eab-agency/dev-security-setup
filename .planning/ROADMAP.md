@@ -10,7 +10,7 @@ None
 
 ## Phases
 
-- [ ] **Phase 1: Script Preparation** - Adapt setup-security.sh for standalone Homebrew execution
+- [x] **Phase 1: Script Preparation** - Adapt setup-security.sh for standalone Homebrew execution
 - [ ] **Phase 2: Version Check** - Add version-check alerting to replace git-pull auto-update
 - [ ] **Phase 3: Release Infrastructure** - Semver tagging, GitHub releases, and tarball generation
 - [ ] **Phase 4: Homebrew Tap** - Create eab-agency/homebrew-tools with formula
@@ -23,11 +23,10 @@ None
 **Goal**: Make `setup-security.sh` work as a standalone binary installed to PATH — remove assumptions about being run from a cloned repo, remove git-pull auto-update logic, ensure all paths are resolved correctly
 **Depends on**: Nothing (first phase)
 **Research**: Unlikely (internal script modifications)
-**Plans**: 2 plans
+**Plans**: 1 plan (consolidated — script was already standalone)
 
 Plans:
-- [ ] 01-01: Remove git-pull auto-update and cloned-repo assumptions
-- [ ] 01-02: Ensure script works from any PATH location (resolve config templates, handle `--force` flag without repo context)
+- [x] 01-01: Add --version flag, detect-secrets check, bump to v3.0.0
 
 ### Phase 2: Version Check
 **Goal**: Replace the removed git-pull auto-update with a mechanism that checks for newer releases and alerts the user
@@ -88,7 +87,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Script Preparation | 0/2 | Not started | - |
+| 1. Script Preparation | 1/1 | Complete | 2026-02-06 |
 | 2. Version Check | 0/2 | Not started | - |
 | 3. Release Infrastructure | 0/2 | Not started | - |
 | 4. Homebrew Tap | 0/2 | Not started | - |
