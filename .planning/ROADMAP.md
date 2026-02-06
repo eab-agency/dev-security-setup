@@ -13,7 +13,7 @@ None
 - [x] **Phase 1: Script Preparation** - Adapt setup-security.sh for standalone Homebrew execution
 - [x] **Phase 2: Version Check** - Add version-check alerting to replace git-pull auto-update
 - [x] **Phase 3: Release Infrastructure** - Semver tagging, GitHub releases, and tarball generation
-- [ ] **Phase 4: Homebrew Tap** - Create eab-agency/homebrew-tools with formula
+- [x] **Phase 4: Homebrew Tap** - Create eab-agency/homebrew-tools with formula
 - [ ] **Phase 5: Documentation** - Update README with Homebrew install instructions
 - [ ] **Phase 6: Validation** - End-to-end testing of brew install workflow
 
@@ -56,7 +56,7 @@ Plans:
 **Plans**: 1 plan (consolidated — testing is part of creation)
 
 Plans:
-- [ ] 04-01: Create homebrew-tools repo with formula, tap and validate
+- [x] 04-01: Create homebrew-tools repo with formula, tap and validate
 
 ### Phase 5: Documentation
 **Goal**: Update README to replace clone-based installation with Homebrew instructions, document all CLI flags, and remove obsolete setup steps
@@ -87,6 +87,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 1. Script Preparation | 1/1 | Complete | 2026-02-06 |
 | 2. Version Check | 1/1 | Complete | 2026-02-06 |
 | 3. Release Infrastructure | 1/1 | Complete | 2026-02-06 |
-| 4. Homebrew Tap | 0/1 | Not started | - |
+| 4. Homebrew Tap | 1/1 | Complete | 2026-02-06 |
 | 5. Documentation | 0/2 | Not started | - |
 | 6. Validation | 0/1 | Not started | - |
