@@ -11,8 +11,8 @@ See: .planning/PROJECT.md (updated 2026-02-05)
 
 Phase: 4 of 6 (Homebrew Tap)
 Plan: Not started
-Status: Phase 3 complete — ready for /gsd:research-phase 4
-Last activity: 2026-02-06 — Completed Phase 3 execution
+Status: Research complete — ready for /gsd:plan-phase 4
+Last activity: 2026-02-06 — Completed Phase 4 research
 
 Progress: █████░░░░░ 50%
 
@@ -57,5 +57,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-06
-Stopped at: Phase 3 complete — ready for /gsd:research-phase 4
+Stopped at: Phase 4 research complete — ready for /gsd:plan-phase 4
 Resume file: None
