@@ -3,3 +3,11 @@
 
 /.vscode
 .vscode
+# Claude AI
+/.planning
+.planning
+
+# Environment files
+.env
+.env.local
+.env.*.local
