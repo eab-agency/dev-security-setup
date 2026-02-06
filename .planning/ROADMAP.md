@@ -62,11 +62,10 @@ Plans:
 **Goal**: Update README to replace clone-based installation with Homebrew instructions, document all CLI flags, and remove obsolete setup steps
 **Depends on**: Phase 4
 **Research**: Unlikely (documentation updates)
-**Plans**: 2 plans
+**Plans**: 1 plan (consolidated — both edits target same file)
 
 Plans:
-- [ ] 05-01: Rewrite installation section with Homebrew instructions
-- [ ] 05-02: Update usage docs, remove shell function references, document upgrade path
+- [ ] 05-01: Rewrite README with Homebrew install, updated usage, upgrade path
 
 ### Phase 6: Validation
 **Goal**: End-to-end verification that `brew tap && brew install` works on a clean system, all flags behave correctly, version tracking works, and upgrade alerting fires
@@ -88,5 +87,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 2. Version Check | 1/1 | Complete | 2026-02-06 |
 | 3. Release Infrastructure | 1/1 | Complete | 2026-02-06 |
 | 4. Homebrew Tap | 1/1 | Complete | 2026-02-06 |
-| 5. Documentation | 0/2 | Not started | - |
+| 5. Documentation | 0/1 | Not started | - |
 | 6. Validation | 0/1 | Not started | - |
