@@ -14,7 +14,7 @@ None
 - [x] **Phase 2: Version Check** - Add version-check alerting to replace git-pull auto-update
 - [x] **Phase 3: Release Infrastructure** - Semver tagging, GitHub releases, and tarball generation
 - [x] **Phase 4: Homebrew Tap** - Create eab-agency/homebrew-tools with formula
-- [ ] **Phase 5: Documentation** - Update README with Homebrew install instructions
+- [x] **Phase 5: Documentation** - Update README with Homebrew install instructions
 - [ ] **Phase 6: Validation** - End-to-end testing of brew install workflow
 
 ## Phase Details
@@ -65,7 +65,7 @@ Plans:
 **Plans**: 1 plan (consolidated — both edits target same file)
 
 Plans:
-- [ ] 05-01: Rewrite README with Homebrew install, updated usage, upgrade path
+- [x] 05-01: Rewrite README with Homebrew install, updated usage, upgrade path
 
 ### Phase 6: Validation
 **Goal**: End-to-end verification that `brew tap && brew install` works on a clean system, all flags behave correctly, version tracking works, and upgrade alerting fires
@@ -87,5 +87,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 2. Version Check | 1/1 | Complete | 2026-02-06 |
 | 3. Release Infrastructure | 1/1 | Complete | 2026-02-06 |
 | 4. Homebrew Tap | 1/1 | Complete | 2026-02-06 |
-| 5. Documentation | 0/1 | Not started | - |
+| 5. Documentation | 1/1 | Complete | 2026-02-06 |
 | 6. Validation | 0/1 | Not started | - |
