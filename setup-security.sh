@@ -68,21 +68,6 @@ for arg in "$@"; do
     esac
 done
 
-echo -e "${GREEN}=====================================${NC}"
-echo -e "${GREEN}  Secret Detection Pipeline Setup${NC}"
-echo -e "${GREEN}       version $VERSION${NC}"
-echo -e "${GREEN}=====================================${NC}"
-echo ""
-
-# Check for updates (non-blocking, cached)
-check_for_updates || true
-
-# Check if we're in a git repository
-if [ ! -d ".git" ]; then
-    echo -e "${RED}Error: Not a git repository. Please run this from a git project root.${NC}"
-    exit 1
-fi
-
 # Version comparison function (returns 0 if $1 >= $2)
 version_gte() {
     [ "$(printf '%s\n' "$1" "$2" | sort -V | head -n1)" = "$2" ]
@@ -126,6 +111,21 @@ check_for_updates() {
         echo ""
     fi
 }
+
+echo -e "${GREEN}=====================================${NC}"
+echo -e "${GREEN}  Secret Detection Pipeline Setup${NC}"
+echo -e "${GREEN}       version $VERSION${NC}"
+echo -e "${GREEN}=====================================${NC}"
+echo ""
+
+# Check for updates (non-blocking, cached)
+check_for_updates || true
+
+# Check if we're in a git repository
+if [ ! -d ".git" ]; then
+    echo -e "${RED}Error: Not a git repository. Please run this from a git project root.${NC}"
+    exit 1
+fi
 
 # Check if already set up and up to date
 if [ -f "$VERSION_FILE" ] && [ "$FORCE" = false ]; then
@@ -493,7 +493,7 @@ if [ -f "$BASELINE_FILE" ]; then
     echo -e "${YELLOW}⚠ $BASELINE_FILE already exists - updating...${NC}"
 fi
 echo "Generating $BASELINE_FILE..."
-detect-secrets scan --exclude-files '(pnpm-lock\.yaml|package-lock\.json|yarn\.lock)$' > "$BASELINE_FILE"
+detect-secrets scan --exclude-files '(node_modules|\.next|dist|build|coverage|\.cache|pnpm-lock\.yaml|package-lock\.json|yarn\.lock)' > "$BASELINE_FILE"
 echo -e "${GREEN}✓${NC} Generated $BASELINE_FILE"
 
 # Install pre-commit hooks
