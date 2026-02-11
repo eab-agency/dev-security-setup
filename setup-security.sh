@@ -2,7 +2,7 @@
 set -e
 
 # Version of this setup script - increment when making changes
-VERSION="1.0.0"
+VERSION="1.0.1"
 # Release process:
 #   1. Update VERSION above to match the new version
 #   2. Commit: git commit -am "chore: bump version to X.Y.Z"
